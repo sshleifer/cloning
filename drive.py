@@ -13,8 +13,10 @@ from flask import Flask
 from io import BytesIO
 
 from keras.models import load_model
+from keras.models import model_from_json
 import h5py
 from keras import __version__ as keras_version
+import helper
 
 sio = socketio.Server()
 app = Flask(__name__)
@@ -44,7 +46,7 @@ class SimplePIController:
 
 
 controller = SimplePIController(0.1, 0.002)
-set_speed = 9
+set_speed = 30
 controller.set_desired(set_speed)
 
 
@@ -61,6 +63,9 @@ def telemetry(sid, data):
         imgString = data["image"]
         image = Image.open(BytesIO(base64.b64decode(imgString)))
         image_array = np.asarray(image)
+        image_array = helper.crop(image_array, 0.35, 0.1)
+        image_array = helper.resize(image_array, new_dim=(64, 64))
+        print(image_array.shape)
         steering_angle = float(model.predict(image_array[None, :, :, :], batch_size=1))
 
         throttle = controller.update(float(speed))
@@ -118,7 +123,7 @@ if __name__ == '__main__':
     if model_version != keras_version:
         print('You are using Keras version ', keras_version,
               ', but the model was built using ', model_version)
-
+    print(args.model)
     model = load_model(args.model)
 
     if args.image_folder != '':
