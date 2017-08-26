@@ -10,9 +10,7 @@ import scipy.misc
 from scipy.ndimage import rotate
 from scipy.stats import bernoulli
 
-# Some useful constants
-DRIVING_LOG_FILE = './data/driving_log.csv'
-IMG_PATH = './data/'
+
 STEERING_COEFFICIENT = 0.229
 
 
@@ -137,19 +135,6 @@ def random_rotation(image, steering_angle, rotation_amount=15):
     return rotate(image, angle, reshape=False), steering_angle + (-1) * rad
 
 
-def min_max(data, a=-0.5, b=0.5):
-    """
-
-    :param data:
-    :param a:
-    :param b:
-    :return:
-    """
-    data_max = np.max(data)
-    data_min = np.min(data)
-    return a + (b - a) * ((data - data_min) / (data_max - data_min))
-
-
 def generate_new_image(image, steering_angle, top_crop_percent=0.35, bottom_crop_percent=0.1,
                        resize_dim=(64, 64), do_shear_prob=0.9):
     """
@@ -168,17 +153,15 @@ def generate_new_image(image, steering_angle, top_crop_percent=0.35, bottom_crop
         image, steering_angle = random_shear(image, steering_angle)
 
     image = crop(image, top_crop_percent, bottom_crop_percent)
-
     image, steering_angle = random_flip(image, steering_angle)
-
     image = random_gamma(image)
-
     image = resize(image, resize_dim)
-
     return image, steering_angle
 
+def clean_path(x):
+    return os.path.basename(x).strip()
 
-def get_next_image_files(batch_size=64):
+def get_next_image_files(data, batch_size=64):
     """
     The simulator records three images (namely: left, center, and right) at a given time
     However, when we are picking images for training we randomly (with equal probability)
@@ -190,46 +173,39 @@ def get_next_image_files(batch_size=64):
     :return:
         An list of selected (image files names, respective steering angles)
     """
-    data = pd.read_csv(DRIVING_LOG_FILE)
+    
     num_of_img = len(data)
     rnd_indices = np.random.randint(0, num_of_img, batch_size)
-
     image_files_and_angles = []
     for index in rnd_indices:
         rnd_image = np.random.randint(0, 3)
         if rnd_image == 0:
-            img = data.iloc[index]['left'].strip()
+            img = clean_path(data.iloc[index]['left'])
             angle = data.iloc[index]['steering'] + STEERING_COEFFICIENT
             image_files_and_angles.append((img, angle))
 
         elif rnd_image == 1:
-            img = data.iloc[index]['center'].strip()
+            img = clean_path(data.iloc[index]['center'])
             angle = data.iloc[index]['steering']
             image_files_and_angles.append((img, angle))
         else:
-            img = data.iloc[index]['right'].strip()
+            img = clean_path(data.iloc[index]['right'])
             angle = data.iloc[index]['steering'] - STEERING_COEFFICIENT
             image_files_and_angles.append((img, angle))
 
     return image_files_and_angles
 
 
-def generate_next_batch(batch_size=64):
-    """
-    This generator yields the next training batch
-
-    :param batch_size:
-        Number of training images in a single batch
-
-    :return:
-        A tuple of features and steering angles as two numpy arrays
-    """
+def generate_next_batch(batch_size=64, path='data'):
+    """This generator yields the next training batch'"""
+    driving_log = '{}/driving_log.csv'.format(path)
+    data = pd.read_csv(driving_log)
     while True:
         X_batch = []
         y_batch = []
-        images = get_next_image_files(batch_size)
+        images = get_next_image_files(data, batch_size)
         for img_file, angle in images:
-            raw_image = plt.imread(IMG_PATH + img_file)
+            raw_image = plt.imread('{}/IMG/{}'.format(path, img_file))
             raw_angle = angle
             new_image, new_angle = generate_new_image(raw_image, raw_angle)
             X_batch.append(new_image)

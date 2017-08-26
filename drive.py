@@ -13,7 +13,6 @@ from flask import Flask
 from io import BytesIO
 
 from keras.models import load_model
-from keras.models import model_from_json
 import h5py
 from keras import __version__ as keras_version
 import helper
