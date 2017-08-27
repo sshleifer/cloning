@@ -161,19 +161,7 @@ def generate_new_image(image, steering_angle, top_crop_percent=0.35, bottom_crop
 def clean_path(x):
     return os.path.basename(x).strip()
 
-def get_next_image_files(data, batch_size=64):
-    """
-    The simulator records three images (namely: left, center, and right) at a given time
-    However, when we are picking images for training we randomly (with equal probability)
-    one of these three images and its steering angle.
-
-    :param batch_size:
-        Size of the image batch
-
-    :return:
-        An list of selected (image files names, respective steering angles)
-    """
-    
+def get_next_image_files(data, batch_size=64):    
     num_of_img = len(data)
     rnd_indices = np.random.randint(0, num_of_img, batch_size)
     image_files_and_angles = []
@@ -196,10 +184,13 @@ def get_next_image_files(data, batch_size=64):
     return image_files_and_angles
 
 
-def generate_next_batch(batch_size=64, path='data'):
+
+from sklearn.utils import shuffle
+def generate_next_batch(batch_size=64, path='data', data=None):
     """This generator yields the next training batch'"""
-    driving_log = '{}/driving_log.csv'.format(path)
-    data = pd.read_csv(driving_log)
+    if data is None:
+        driving_log = '{}/driving_log.csv'.format(path)
+        data = shuffle(pd.read_csv(driving_log))
     while True:
         X_batch = []
         y_batch = []
