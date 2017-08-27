@@ -15,17 +15,13 @@ STEERING_COEFFICIENT = 0.229
 
 
 def crop(image, top_percent, bottom_percent):
-    """
-    Crops an image according to the given parameters
-
+    """Crops an image according to the given parameters
     :param image: source image
-
     :param top_percent:
         The percentage of the original image will be cropped from the top of the image
 
     :param bottom_percent:
         The percentage of the original image will be cropped from the bottom of the image
-
     :return:
         The cropped image
     """
@@ -34,19 +30,12 @@ def crop(image, top_percent, bottom_percent):
 
     top = int(np.ceil(image.shape[0] * top_percent))
     bottom = image.shape[0] - int(np.ceil(image.shape[0] * bottom_percent))
-
     return image[top:bottom, :]
 
 
 def resize(image, new_dim):
     """
     Resize a given image according the the new dimension
-
-    :param image:
-        Source image
-
-    :param new_dim:
-        A tuple which represents the resize dimension
 
     :return:
         Resize image
@@ -59,9 +48,6 @@ def random_flip(image, steering_angle, flipping_prob=0.5):
     Based on the outcome of an coin flip, the image will be flipped.
     If flipping is applied, the steering angle will be negated.
 
-    :param image: Source image
-
-    :param steering_angle: Original steering angle
 
     :return: Both flipped image and new steering angle
     """
@@ -137,16 +123,7 @@ def random_rotation(image, steering_angle, rotation_amount=15):
 
 def generate_new_image(image, steering_angle, top_crop_percent=0.35, bottom_crop_percent=0.1,
                        resize_dim=(64, 64), do_shear_prob=0.9):
-    """
-
-    :param image:
-    :param steering_angle:
-    :param top_crop_percent:
-    :param bottom_crop_percent:
-    :param resize_dim:
-    :param do_shear_prob:
-    :param shear_range:
-    :return:
+    """generate a new image that is the same image randomly rotated and randomly sheared
     """
     head = bernoulli.rvs(do_shear_prob)
     if head == 1:
@@ -158,8 +135,9 @@ def generate_new_image(image, steering_angle, top_crop_percent=0.35, bottom_crop
     image = resize(image, resize_dim)
     return image, steering_angle
 
-def clean_path(x):
-    return os.path.basename(x).strip()
+
+def get_basename(full_path):
+    return os.path.basename(full_path).strip()
 
 def get_next_image_files(data, batch_size=64):    
     num_of_img = len(data)
@@ -168,29 +146,27 @@ def get_next_image_files(data, batch_size=64):
     for index in rnd_indices:
         rnd_image = np.random.randint(0, 3)
         if rnd_image == 0:
-            img = clean_path(data.iloc[index]['left'])
+            img = get_basename(data.iloc[index]['left'])
             angle = data.iloc[index]['steering'] + STEERING_COEFFICIENT
             image_files_and_angles.append((img, angle))
 
         elif rnd_image == 1:
-            img = clean_path(data.iloc[index]['center'])
+            img = get_basename(data.iloc[index]['center'])
             angle = data.iloc[index]['steering']
             image_files_and_angles.append((img, angle))
         else:
-            img = clean_path(data.iloc[index]['right'])
+            img = get_basename(data.iloc[index]['right'])
             angle = data.iloc[index]['steering'] - STEERING_COEFFICIENT
             image_files_and_angles.append((img, angle))
 
     return image_files_and_angles
 
 
-
-from sklearn.utils import shuffle
 def generate_next_batch(batch_size=64, path='data', data=None):
     """This generator yields the next training batch'"""
     if data is None:
         driving_log = '{}/driving_log.csv'.format(path)
-        data = shuffle(pd.read_csv(driving_log))
+        data = pd.read_csv(driving_log)
     while True:
         X_batch = []
         y_batch = []
