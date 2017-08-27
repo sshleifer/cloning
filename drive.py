@@ -20,7 +20,7 @@ sio = socketio.Server()
 app = Flask(__name__)
 model = None
 prev_image_array = None
-
+pred_angles = []
 
 class SimplePIController:
     def __init__(self, Kp, Ki):
@@ -44,12 +44,16 @@ class SimplePIController:
 
 
 controller = SimplePIController(0.1, 0.002)
-set_speed = 10
+set_speed = 5
 controller.set_desired(set_speed)
 
+import pandas as pd
+
+preds = []
 
 @sio.on('telemetry')
 def telemetry(sid, data):
+
     if data:
         # The current steering angle of the car
         steering_angle = data["steering_angle"]
@@ -63,11 +67,11 @@ def telemetry(sid, data):
         image_array = np.asarray(image)
         image_array = helper.crop(image_array, 0.35, 0.1)
         image_array = helper.resize(image_array, new_dim=(64, 64))
-        print(image_array.shape)
-        steering_angle = float(model.predict(image_array[None, :, :, :], batch_size=1))
+        steering_angle = float(model.predict(image_array[None, :, :, :],
+                                             batch_size=1))
 
         throttle = controller.update(float(speed))
-
+        preds.append(steering_angle)
         print(steering_angle, throttle)
         send_control(steering_angle, throttle)
 
@@ -76,6 +80,7 @@ def telemetry(sid, data):
             timestamp = datetime.utcnow().strftime('%Y_%m_%d_%H_%M_%S_%f')[:-3]
             image_filename = os.path.join(args.image_folder, timestamp)
             image.save('{}.jpg'.format(image_filename))
+        pd.Series(preds).to_csv('preds_oos2.csv')
     else:
         # NOTE: DON'T EDIT THIS.
         sio.emit('manual', data={}, skip_sid=True)
