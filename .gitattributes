@@ -1,3 +1,5 @@
 bean_bag.mp4 filter=lfs diff=lfs merge=lfs -text
 videos/bean_bag.mp4 filter=lfs diff=lfs merge=lfs -text
 videos/t2_in_sample.mp4 filter=lfs diff=lfs merge=lfs -text
+tr1_data.zip filter=lfs diff=lfs merge=lfs -text
+t2_train.zip filter=lfs diff=lfs merge=lfs -text

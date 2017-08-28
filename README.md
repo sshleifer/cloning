@@ -18,11 +18,9 @@ I also used that repo's generator skeleton code, but changed the logic to better
 
 ![jpeg](examples/center_2016_12_01_13_30_48_287.jpg)
 
-
-
 ### NVIDIA Architecture
 
-the `NvidiaNet` architecture in model.py implements the same architecture described in the Nvidia paper, but adds Dropout after the two largest Dense layers, and Batch norm after the first large dense layer to avoid overfitting and improve generalization between tracks
+The `NvidiaNet` architecture in `model.py` implements the same architecture described in the Nvidia paper, 5 conv - max pooling blocks followed by 4 FC layers, but adds Dropout after the two largest Dense layers, and Batch norm after the first large dense layer to avoid overfitting and improve generalization between tracks. 
 
 ![png](examples/architecture_diagram.png)
 

@@ -80,4 +80,4 @@ if __name__ == '__main__':
     data = pd.read_csv('t2_train/driving_log.csv')
     clone_net = NvidiaNet()
     clone_net.create_generators(data, 't2_train')
-    clone_net.fit_generator(2)
+    clone_net.fit_generator(20)
