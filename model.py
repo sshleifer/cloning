@@ -1,6 +1,6 @@
 import pandas as pd
 
-from keras.layers import Dense, Flatten, Lambda, Activation, MaxPooling2D
+from keras.layers import Dense, Flatten, Lambda, Activation, MaxPooling2D, Dropout
 from keras.layers.convolutional import Convolution2D
 from keras.layers.normalization import BatchNormalization
 from keras.models import Sequential
@@ -37,8 +37,10 @@ class NvidiaNet():
 
         model.add(Flatten())
         add_dense_block(model, 1164)
+        model.add(Dropout(.3))
         model.add(BatchNormalization())
         add_dense_block(model, 100)
+        model.add(Dropout(.3))
         add_dense_block(model, 50)
         add_dense_block(model, 10)
 
