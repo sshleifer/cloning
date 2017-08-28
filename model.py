@@ -25,7 +25,7 @@ def add_dense_block(model, n_hidden):
 
 class NvidiaNet():
 
-    def __init__(self, checkpoint_path='t1-weights-improvement-{epoch:02d}-{val_loss:.2f}.h5'):
+    def __init__(self, checkpoint_path='t1-weights-improvement-{val_loss:.2f}.h5'):
         model = Sequential()
 
         model.add(Lambda(lambda x: x / 127.5 - 1.0, input_shape=(64, 64, 3)))
@@ -77,7 +77,8 @@ class NvidiaNet():
         )
 
 if __name__ == '__main__':
-    data = pd.read_csv('t2_train/driving_log.csv')
+    data_dir = 't2_train'
+    data = pd.read_csv('{}/driving_log.csv'.format(data_dir))
     clone_net = NvidiaNet()
-    clone_net.create_generators(data, 't2_train')
+    clone_net.create_generators(data, data_dir)
     clone_net.fit_generator(20)

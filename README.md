@@ -1,5 +1,18 @@
 ### Overview
-This project aims to build a model that can predict the steering angle a human chose on a driving simulator, given the image the human saw on the screen, thereby "cloning" human behavior. The simulator provides two training tracks. A copy of Nvidia's End 2 End Neural Network architecture, trained on track 1 images can easily drive around track 1, and, as we can see from validation loss, the model can generalize to unseen track 1 images. Generalizing to track 2 images, has, so far proven more difficult. No model that has only seen track 1 images has performed better than .173 MSE on unseen track 2 images, whereas a model that has seen a few track2 images in addition to the track 1 images can achieve validation loss of .11 on **unseen** track 2 images. Similarly, a model that has trained on track 2 images can make it around track two without crashing, as shown in `videos/t2_in_sample.mp4`, whereas a model that has only been trained on track 1 data crashes at a difficult left turn, as shown in `videos/t2_oos.mp4`. Both models can easily complete track 1, as shown in `video.mp4`.
+
+This project aims to build a model that can predict the steering angle a human chose on a driving simulator, given the image the human saw on the screen, thereby "cloning" human behavior. The simulator provides two training tracks. A copy of Nvidia's End 2 End Neural Network architecture, trained on track 1 images can easily drive around track 1, and, as we can see from validation loss, the model can generalize to unseen track 1 images. Credit is also due to github.com/upul/Behavioral-Cloning, whose image augmentation pipeline was used.
+
+Generalizing to track 2 images, has, so far proven more difficult. No model that has only seen track 1 images has performed better than .173 MSE on unseen track 2 images, whereas a model that has seen a few track2 images in addition to the track 1 images can achieve validation loss of .11 on **unseen** track 2 images. Similarly, a model that has trained on track 2 images can make it around track two without crashing, as shown in `videos/t2_in_sample.mp4`, whereas a model that has only been trained on track 1 data crashes at a difficult left turn, as shown in `videos/t2_oos.mp4`. Both models can easily complete track 1, as shown in `video.mp4`.
+
+### Running the model
+
+1) unzip tr1_data.zip or t2_train.zip
+2) edit the `data_dir` variable atthe bottom of model.py to the data directory you want, e.g. `data_dir = 't2_train'`
+3) find the checkpoint created with the best validation loss, eg `t1-weights-improvement-07-0.01.hdf5`
+4)  `mkdir autonomous_output`
+5) python drive.py `t1-weights-improvement-07-0.01.hdf5` autonomous_output
+6) open the Udacity simulator, and run autonomous mode on your track
+7) optionally save a video with `python video.py autonomous_output`
 
 ### Data collection
 
@@ -18,11 +31,6 @@ I also used that repo's generator skeleton code, but changed the logic to better
 
 ![jpeg](examples/center_2016_12_01_13_30_48_287.jpg)
 
-### NVIDIA Architecture
-
-The `NvidiaNet` architecture in `model.py` implements the same architecture described in the Nvidia paper, 5 conv - max pooling blocks followed by 4 FC layers, but adds Dropout after the two largest Dense layers, and Batch norm after the first large dense layer to avoid overfitting and improve generalization between tracks. 
-
-![png](examples/architecture_diagram.png)
 
 ### Data Augmentation Pipeline
 in `generate_new_image`, from helper.py, we generate 64 augmented images.
@@ -32,6 +40,11 @@ Then we sometimes flip the image and make the desired angle negative. This helps
 
 The randomness means that even though we have 25000 training images, the model keeps learning new images it has never seen before, and validation accuracy continues to improve for many more than the 3 epochs of improvement that I was seeing with out the preprocessing.
 
+### NVIDIA Architecture
+
+After data augmentation, The `NvidiaNet` architecture in `model.py` implements the same architecture described in the Nvidia paper, 5 conv - max pooling blocks followed by 4 FC layers, but adds Dropout after the two largest Dense layers, and Batch norm after the first large dense layer to avoid overfitting and improve generalization between tracks.
+
+![png](examples/architecture_diagram.png)
 
 
 ### Solution Design
@@ -82,7 +95,7 @@ As the the figure below shows, the oos model (blue line) actually has a much mor
 ![png](examples/oos_before_turn.png)
 
 
-### Conclusions
+### Next Steps
 
 I can think of a few possible ways to improve generalization between tracks:
 
@@ -93,11 +106,3 @@ I can think of a few possible ways to improve generalization between tracks:
 3) Other image augmentation techniques that synthetically create sharp turn data
 
 4) Post-processing that slows down if the steering angle is high
-
-
-
-
-
-```python
-
-```
