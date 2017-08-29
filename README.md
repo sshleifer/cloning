@@ -68,7 +68,7 @@ This improved results on both track 1 and track 2. We were now at something like
 
 5) Try training architecture 3 for 40 epochs. (Also failed)
 
-### Understanding the crash on track 2 for the model trained on track 1 data
+#### Understanding the crash on track 2 for the model trained on track 1 data
 
 In the simulator, it appears that there are two reasons the model that has seen track 2 data succeeds while the out of sample model (blue line) fails: first,  is the out of sample model starts the difficult turn closer to the left side of the road, and therefore has to make a much tighter turn than the in-sample model which starts in the middle of the road.
 
@@ -77,8 +77,6 @@ Second, around timestep 2550, the oos model stops turning left aggressively, was
 
 As the the figure below shows, the oos model (blue line) actually has a much more negative steering angle before the crash. If the OOS model had been closer to the center of the road, or not gone straight briefly mid-turn, the crash would have been avoided.
 
-
-
 ![png](examples/crash_preds.png)
 
 ### In sample model near center, facing more leftward
@@ -86,7 +84,7 @@ As the the figure below shows, the oos model (blue line) actually has a much mor
 
 ![png](examples/in_sample_before_turn.png)
 
-### OOS model closer to left of road, facing straight, about to crash
+### Out of sample model closer to left of road, facing straight, about to crash
 
 ![png](examples/oos_before_turn.png)
 
@@ -94,7 +92,7 @@ As the the figure below shows, the oos model (blue line) actually has a much mor
 
 I can think of a few possible ways to improve generalization between tracks:
 
-1) generate more sharp turn on track 1 data by doing recovery laps
+1) Generate more sharp turn on track 1 data by doing recovery laps
 
 2) Testing different possible Dropout probabilities and configurations
 
