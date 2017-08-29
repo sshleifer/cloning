@@ -81,19 +81,14 @@ As the the figure below shows, the oos model (blue line) actually has a much mor
 
 ![png](examples/crash_preds.png)
 
-
-
 ### In sample model near center, facing more leftward
 
 
 ![png](examples/in_sample_before_turn.png)
 
-
-
 ### OOS model closer to left of road, facing straight, about to crash
 
 ![png](examples/oos_before_turn.png)
-
 
 ### Next Steps
 
@@ -105,4 +100,4 @@ I can think of a few possible ways to improve generalization between tracks:
 
 3) Other image augmentation techniques that synthetically create sharp turn data
 
-4) Post-processing that slows down if the steering angle is high
+4) Post-processing that slows down the throttle if the steering angle is high.
